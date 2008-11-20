@@ -1,7 +1,6 @@
 # Enable this extension so we can parse the spec files
 
 # If desired set this variable to use our own rspec-like DSL
-#ENV['MOCK_RSPEC'] = "1"
 unless ENV['MOCK_RSPEC'] == "1"
   require 'spec'
   require 'mocha'
@@ -86,7 +85,7 @@ class Object
     def spec_all
       Spec::Runner::CommandLine.run(
         Spec::Runner::OptionParser.parse(
-          ['C:\documents\code\ruby_chess\spec\unit\models',
+	   [File.expand_path( File.join( File.dirname( __FILE__), '/unit/models') ),
           '-p', '**/*spec*'
           ], $stderr, $stdout
         )
@@ -96,7 +95,7 @@ class Object
     def spec name
       Spec::Runner::CommandLine.run(
         Spec::Runner::OptionParser.parse(
-          ['C:\documents\code\ruby_chess\spec\unit\models',
+	   [File.expand_path( File.join( File.dirname( __FILE__), '/unit/models') ),
           '-p', '**/*spec*',
            '-e', name
           ], $stderr, $stdout
