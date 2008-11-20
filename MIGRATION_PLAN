@@ -1,0 +1,26 @@
+If I do the following, tests will be able to be run either in irb or from CL, and with or without
+ActiveRecord ever hitting the database at all. Automatic fixtures support not yet included...
+
+1)  Map onto existing directory structure, forward port any changes possible, and CI
+
+2)  Make fixes here
+-  Remove relative spec_helper requires from top of file (should only cripple direct CL runs)
+-  _spec.rb => .spec 
+-  d4, e5, dxe5 notates only e5 ?? 
+-  Pull LinesOfAttack out of pieces
+-  (move_spec) ensure valid? calls do_validate
+-  Ensure can play immortal ! (restore move-from-notation)
+-  implement a custom rake stats for this, CNU project
+
+3)  begin benchmarking non-activerecord stuff - the original stated purpose of gutting AR !
+    compare fake AR to arr with (mysql, sqllite in memory)
+
+4) Make CI use these tests ? 
+
+Also, it's noted that most current tests are mainly functional tests, and should be reorganized and/
+or refactored as such. It's kinda nice to flow through several objects to ensure the end result
+is working, but it has side effects such as cascading test failures, and maintainability
+
+Extra Credit:
+  Patch source_annotation_extractor to take different dirs as arguments
+  Create plug-in of this functionality, assess gap between here and full AR mock impl

@@ -1,0 +1,30 @@
+#!/usr/bin/env ruby
+# Sets up an environment where ActiveRecord classes are allowed to run free of the database
+# Expectations: you will not have persistance except through manual efforts
+
+# set up class loading path
+$: << File.dirname( __FILE__) + '/../'
+$: << File.dirname( __FILE__) + '/../lib'
+
+require 'logger'
+
+#logger.info "Loading classes from:" + $: * "\n"
+
+
+#begin console code yanked from C:\ruby\lib\ruby\gems\1.8\gems\rails-2.1.0\lib\commands\console
+
+libs =  " -r irb/completion"
+libs << " -r util"
+libs << " -r logger"
+libs << " -r active_record_mock"
+libs << " -r load_models"
+libs << " -r spec/spec_helper"
+libs << " -r chess_active_record_mock"
+
+load_path =  " -I " + File.expand_path( File.join( File.dirname( __FILE__), '/../') )
+load_path << " -I " + File.expand_path( File.join( File.dirname( __FILE__), '/../lib') )
+load_path << " -I " + File.expand_path( File.join( File.dirname( __FILE__), '/../app/models') )
+load_path << " -I " + File.expand_path( File.join( File.dirname( __FILE__), '/../app/models/pieces') )
+
+exec "irb.bat #{load_path} #{libs} --simple-prompt"
+
