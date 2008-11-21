@@ -14,9 +14,11 @@ module ActiveRecord
         self.instance_variable_set "@#{k}", v
       end
     end
+
     def [] (key)
       return instance_variable_get("@#{key}") if instance_variables.include? "@#{key}"
     end
+
     def []= (key, val)
       return instance_variable_set("@#{key}", val) #if instance_variables.include? "@#{key}"
     end
@@ -26,6 +28,7 @@ module ActiveRecord
     end
     
     def valid?
+      do_validate unless @validated
       errors.length == 0
     end
     
@@ -33,23 +36,19 @@ module ActiveRecord
     # proper order. do_save is a friend of its and common functionality may be factored out of them
     # in the future
     def do_validate
-      #@valid? = true
+      @validated = true
       bvs = self.class.class_eval( "@@before_validators" ) rescue []
       bvs.each do |bv|
-        logger.bv " --- Calling #{bv} before-validator"
         result = self.send bv if self.respond_to? bv
         return false unless valid?
       end
       rvs = self.class.class_eval("@@real_validators") rescue []
       rvs.each do |rv|
-        logger.rv " --- Calling #{rv} real-validator"
         result = self.send rv if self.respond_to? rv
-        logger.rv "Result of #{rv} was #{result}"
         return false unless valid?
       end
       avs = self.class.class_eval("@@after_validators") rescue []
       avs.each do |av|
-        logger.av " --- Calling #{av} after-validator"
         result = self.send av if self.respond_to? av
       end
       
@@ -60,7 +59,6 @@ module ActiveRecord
     # TODO save should give it an ID - possibly its object_id ?
     def save
       if !valid?
-        logger.error 'Cannot save - not in valid? state'
         return false
       end
       do_save
@@ -70,20 +68,20 @@ module ActiveRecord
     def do_save
       bss = self.class.class_eval( "@@before_savers" ) rescue []
       bss.each do |bs|
-        logger.bs " --- Calling #{bs} before-saver"
         if self.respond_to? bs
             result = self.send( bs ) rescue false
           end
       end
       ass = self.class.class_eval( "@@after_savers" ) rescue []
       ass.each do |as|
-        logger.as " --- Calling #{as} after-save-method"
         if self.respond_to? as
           result = self.send( as ) rescue false
         end
       end
     end
     
+    def reload; self; end
+
     # tries to act as 1) instance variable accesssor...
 =begin
     def method_missing name, *args
@@ -117,12 +115,12 @@ module ActiveRecord
       def has_many symname, *args
         assoc = symname.to_s
         me = self 
-        
+
         class_eval do
           define_method "#{assoc}" do
             unless instance_variable_get "@#{assoc}"
-              instance_variable_set "@#{assoc}", as = AssociationStore.new
-              eval "as.parent = self"
+              as = AssociationStore.new( self, args )
+              instance_variable_set "@#{assoc}", as
             end
             instance_variable_get "@#{assoc}"
           end

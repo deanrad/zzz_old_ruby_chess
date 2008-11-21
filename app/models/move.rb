@@ -30,7 +30,15 @@ class Move < ActiveRecord::Base
   #after_save :check_for_mate
     
   attr_accessor :board
-  
+
+  def initialize *opts
+    if Hash===opts[0]
+      super
+    elsif opts.length == 2
+      @from_coord, @to_coord = opts
+    end
+  end
+
   def calculate_board
     @board ||= match.board if match
   end
