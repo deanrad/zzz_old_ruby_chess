@@ -2,6 +2,9 @@
 # Sets up an environment where ActiveRecord classes are allowed to run free of the database
 # Expectations: you will not have persistance except through manual efforts
 
+# find irb appropriately
+irb = RUBY_PLATFORM =~ /(:?mswin|mingw)/ ? 'irb.bat' : 'irb'
+
 # set up class loading path
 $: << File.dirname( __FILE__) + '/../'
 $: << File.dirname( __FILE__) + '/../lib'
@@ -24,5 +27,5 @@ load_path << " -I " + File.expand_path( File.join( File.dirname( __FILE__), '/..
 load_path << " -I " + File.expand_path( File.join( File.dirname( __FILE__), '/../app/models') )
 load_path << " -I " + File.expand_path( File.join( File.dirname( __FILE__), '/../app/models/pieces') )
 
-exec "irb #{load_path} #{libs} --simple-prompt"
+exec "#{irb} #{load_path} #{libs} --simple-prompt"
 
