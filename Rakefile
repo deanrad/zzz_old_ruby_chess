@@ -26,3 +26,9 @@ desc "Finds a LEFTOFF annotation to show you where you left off"
 task :leftoff do
   SourceAnnotationExtractor.enumerate "LEFTOFF" #, :tag => true
 end
+
+desc "Runs performance tests on the entire application"
+task :perf_all do
+  #TODO Not implemented yet
+  puts "Not implemented yet"
+end
