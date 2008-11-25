@@ -2,10 +2,10 @@ require 'association_store'
 
 module ActiveRecord
   class Base
-    logger.info "loaded fake #{self}"
+    # logger.info "loaded fake #{self}"
 
     def included(other)
-      logger.info "looks like #{other} is being extended by fake AR now, eh ?"
+      # logger.info "looks like #{other} is being extended by fake AR now, eh ?"
     end
 
     # Hash-based Initializer
@@ -85,12 +85,12 @@ module ActiveRecord
     # tries to act as 1) instance variable accesssor...
 =begin
     def method_missing name, *args
-      logger.info "#{name}"
+      # logger.info "#{name}"
       return nil
     end
     def method_missing name, *args
       name = name.to_s
-      logger.info "#{name}"
+      # logger.info "#{name}"
       if instance_variables.include? "@#{name.sub /\w+=/, ''}"
         return instance_variable_set("@#{name.sub '=', ''}", args[0]) if name =~ /\w+=/
         return instance_variable_get("@#{name}")
@@ -105,7 +105,7 @@ module ActiveRecord
       def add field, msg
         self[field] ||= []
         self[field] << msg
-        logger.validation "#{field}:#{msg}"
+        # logger.validation "#{field}:#{msg}"
       end
     end
     
@@ -134,7 +134,7 @@ module ActiveRecord
         class_eval do
           define_method :method_missing do |name, *args|
             #possibly resolve via instance_variable_get "@#{name}"
-            logger.info "got message #{name} that we weren't ready for"
+            # logger.info "got message #{name} that we weren't ready for"
           end
         end
       end
@@ -158,7 +158,7 @@ module ActiveRecord
         class_eval do
           class_variable_set "@@after_savers", after_savers
         end
-        logger.info "appended #{args} as after_savers"
+        # logger.info "appended #{args} as after_savers"
       end
     
       def before_validation *args
@@ -167,7 +167,7 @@ module ActiveRecord
         class_eval do
           class_variable_set "@@before_validators", before_validators
         end
-        logger.info "appended #{args} as pre-validators"
+        # logger.info "appended #{args} as pre-validators"
       end
       def after_validation  *args
         after_validators ||= []
@@ -186,7 +186,7 @@ module ActiveRecord
       def validates_presence_of *args; end
       def validates_length_of *args; end
       def method_missing name, *args
-        logger.info "ActiveRecord::Base.#{name} referred to but not mocked out"
+        # logger.info "ActiveRecord::Base.#{name} referred to but not mocked out"
       end
     end
   end

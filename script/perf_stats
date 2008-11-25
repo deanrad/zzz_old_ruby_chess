@@ -9,18 +9,18 @@ irb = RUBY_PLATFORM =~ /(:?mswin|mingw)/ ? 'irb.bat' : 'irb'
 $: << File.dirname( __FILE__) + '/../lib'
 require 'db_free_includes'
 require 'benchmark'
-require 'chess_fixtures'
-include ChessFixtures
 
 DbFreeIncludes::IRB_LOAD_PATHS.each do |p|
   $: << File.expand_path( File.join( File.dirname( __FILE__), "/../#{p}" ) )
 end
 
-# DbFreeIncludes::IRB_REQUIRES.each{ |r| require r }
-gem 'rails'
+DbFreeIncludes::IRB_REQUIRES.each{ |r| require r }
+# gem 'rails'
+require 'chess_fixtures'
+include ChessFixtures
 
 
-begin; GC.enable; GC.start; GC.disable; rescue nil; end
+#begin; GC.enable; GC.start; GC.disable; rescue nil; end
 
 num_times = 100
 cm_time = Benchmark.realtime do
