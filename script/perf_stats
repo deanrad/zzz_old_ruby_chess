@@ -1,0 +1,42 @@
+#!/usr/bin/env ruby
+# Sets up an environment where ActiveRecord classes are allowed to run free of the database
+# Expectations: you will not have persistance except through manual efforts
+
+# find irb appropriately
+irb = RUBY_PLATFORM =~ /(:?mswin|mingw)/ ? 'irb.bat' : 'irb'
+
+# set up class loading path for files called immediately by this script
+$: << File.dirname( __FILE__) + '/../lib'
+require 'db_free_includes'
+require 'benchmark'
+require 'chess_fixtures'
+include ChessFixtures
+
+DbFreeIncludes::IRB_LOAD_PATHS.each do |p|
+  $: << File.expand_path( File.join( File.dirname( __FILE__), "/../#{p}" ) )
+end
+
+# DbFreeIncludes::IRB_REQUIRES.each{ |r| require r }
+gem 'rails'
+
+
+begin; GC.enable; GC.start; GC.disable; rescue nil; end
+
+num_times = 100
+cm_time = Benchmark.realtime do
+  num_times.times do
+    m = matches(:scholars_mate)
+    m.moves << Move.new( :h5, :f7 )
+  end
+end
+non_cm_time = Benchmark.realtime do
+  num_times.times do
+    m = matches(:scholars_mate)
+    m.moves << Move.new( :c4, :f7 )
+  end
+end
+
+puts "Scholars mate checkmate #{num_times} in #{cm_time} seconds"
+puts "Scholars mate non-checkmate #{num_times} in #{non_cm_time} seconds"
+#exec "#{irb} #{load_path} #{libs} --simple-prompt"
+
