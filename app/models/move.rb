@@ -22,7 +22,6 @@ class Move < ActiveRecord::Base
   after_validation :update_capture_coord,
                    :update_castling_field,
                    :update_promotion_field,
-                   :update_move_number,
                    :update_notation
 
   #this line added just for developing active_record_mock test case
@@ -35,7 +34,12 @@ class Move < ActiveRecord::Base
     if Hash===opts[0]
       super
     elsif opts.length == 2
-      @from_coord, @to_coord = opts
+      #we have to pop our two custom args off the stack and call super with a null opts
+      from = opts.shift
+      to = opts.shift
+      super
+      #before we can access these attributes
+      self[:from_coord], self[:to_coord] = from, to
     end
   end
 
@@ -127,10 +131,6 @@ class Move < ActiveRecord::Base
     if Position.new(to_coord).rank == Sides[other_side].back_rank
       self[:promotion_piece] ||= Piece.role_to_abbrev(:queen)
     end
-  end
-  
-  def update_move_number
-    #TODO update move_number for move
   end
   
   def update_notation
