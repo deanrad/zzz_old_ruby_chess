@@ -33,6 +33,7 @@ class Notation
 
   # Allows a caller to get the coordinates represented by a move, or an error
   def to_coords
+    @next_to_move ||= :white
     return [@from_coord, @to_coord] if @from_coord && @to_coord
     @from_coord, @to_coord = parse_notation
   end
@@ -98,7 +99,7 @@ class Notation
     @promotion_choice = $6    
 
     possible_froms = @board.keys.select do |k| 
-      @board[k] && (@board[k].role==@role) && (@board[k].side==@next_to_move)
+      @board[k] && (@board[k].role==@role) && (@board[k].side==@next_to_move) &&
       @board.allowed_moves(k).include?(@to_coord) 
     end
     raise Exception, "No #{@role} capable of moving to #{@notation} on this board" unless possible_froms.length > 0

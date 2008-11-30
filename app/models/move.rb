@@ -55,7 +55,7 @@ class Move < ActiveRecord::Base
   def parse_notation
     return if self[:notation].blank? 
     notation = Notation.new( self[:notation], @board )
-    notation.next_to_move = self.next_to_move
+    notation.next_to_move = match.next_to_move
     self[:from_coord], self[:to_coord] = notation.to_coords
   rescue => ex
     errors.add :notation, ex.to_s
