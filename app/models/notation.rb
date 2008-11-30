@@ -11,7 +11,10 @@ class Notation
     end
   end
 
-  attr_accessor :role, :disambiguator, :capture, :to_coord, :from_coord, :promotion_choice, :check, :checkmate, :board
+  #                  1=piece moving   2=disambig  3=capture 4=coord 5/6=promo
+  NOTATION_REGEX = /([KQBNRabcdefgh])?([a-h1-8]?)(x)?([a-h][1-8])(=([QBNR]))?[+!?#]*/
+  
+  attr_accessor :role, :disambiguator, :capture, :to_coord, :from_coord, :promotion_choice, :check, :checkmate, :board, :next_to_move
   
   #we may be setting notation in the event of interpreting it, or getting it in the case of creating it
   attr_accessor :notation
@@ -25,8 +28,15 @@ class Notation
   
   #does the work of serializing an instance of this class for display or db storage
   def to_s
-    @notation || create_notation_from_fields
+    @notation || castling_notation_from_fields || create_notation_from_fields
   end
+
+  # Allows a caller to get the coordinates represented by a move, or an error
+  def to_coords
+    return [@from_coord, @to_coord] if @from_coord && @to_coord
+    @from_coord, @to_coord = parse_notation
+  end
+  
   
   private
   
@@ -39,6 +49,14 @@ class Notation
   def init_from_notation_and_board(note, board)
     @notation = note
     @board = board
+  end
+  
+  def castling_notation_from_fields
+    k = @board[@from_coord]
+    return nil unless k && k.role == :king
+    vector = Position.new(@to_coord) - Position.new(@from_coord)
+    return nil unless k.is_castling_move?( @from_coord, vector, @board)
+    vector[1] > 0 ? "O-O" : "O-O-O" #kingside is in increasing direction of files a-h
   end
   
   #unless you are using this class to interpret a notation, serializes fields into notation conforming
@@ -56,10 +74,50 @@ class Notation
     @notation += check_notation || ''
     @notation
   end
+  
+  def parse_notation
+    parse_castle || parse_regular
+  end
+  
+  def parse_castle
+    return unless @notation =~ /O-O(-O)?/
+    from_file = "e"                           #castling always from e
+    rank = @next_to_move == :black ? "8" : "1"
+    to_file = $1 ? "c" : "g"
+    [ Position.new( from_file, rank ).to_sym , Position.new( to_file, rank ).to_sym ] 
+  end
+  
+  def parse_regular
+    raise Exception, "Unrecognized notation #{@notation}" unless @notation =~ NOTATION_REGEX
+    # 1=piece moving   2=disambig  3=capture 4=coord 5/6=promo
+    # puts [$1, $2, $3, $4, $5, $6].inspect
+    @role = Notation.role_of($1)
+    @disambiguator = $2
+    @capture = !$3.blank?
+    @to_coord = Position.new($4).to_sym
+    @promotion_choice = $6    
+
+    possible_froms = @board.keys.select do |k| 
+      @board[k] && @board[k].role==@role && @board.allowed_moves(k).include?(@to_coord)
+    end
+    
+    @from_coord = (possible_froms.length==1 && possible_froms[0]) || disambiguate( possible_froms )
+        
+    from, to = Position.new(@from_coord), Position.new(@to_coord)
+    raise Exception, "Unable to determine move from notation #{@notation}" unless from.valid? and to.valid?
+    [@from_coord, @to_coord]
+  end
+
+  def disambiguate( possible_froms )
+    raise Exception, "More than one #{@role} can move to #{@to_coord}. Please include a file or rank - Nbc3 or N5f7 for example." if @disambiguator.blank?
+    
+    match1, match2 = possible_froms.select{|f| f.to_s.include?(@disambiguator) }
+    return match1 unless match2
+  end
 
   def role_at_coord(coord)
     piece = @board[coord]
-        raise ArgumentError, coord unless piece
+    raise ArgumentError, coord unless piece
     piece.role
   end
   
@@ -103,6 +161,8 @@ class Notation
   end
   
   def check_notation
+    return '#' if @checkmate
+    return '+' if @check
     side_moved_on = Sides.opposite_of(@board[@from_coord].side)
     @board.consider_move( Move.new(:from_coord => @from_coord, :to_coord => @to_coord) ) do
       @check = @board.in_check?(side_moved_on) 
