@@ -23,6 +23,14 @@ module ChessFixtures
       m = Match.new( :board => Board[:a1 => Rook.new(:white, :queens), :e1 => King.new(:white), :h1 => Rook.new(:white, :kings)])
     end
 
+    #else check our fixtures file
+    moves = moves_for_match(which)
+    if moves.length > 0
+      match = Match.new( :name => which.to_s )
+      moves.each{ |move| match.moves << move }
+      @@fixtures[which] = match
+    end
+
     unless @@fixtures.keys.include? which
       raise Exception, "Dont have fixture #{which} in repository" 
     end
@@ -33,5 +41,21 @@ module ChessFixtures
   def players( which )
     p = Player.new( :login => which.to_s )
     p
+  end
+  
+  #Read the moves.csv for matching lines  #TODO really ugly and hacky
+  require 'csv'
+  def moves_for_match( match_name )
+    moves_path =  File.expand_path( File.join( File.dirname( __FILE__), "/../spec/fixtures/moves.csv" ) )
+    csv = CSV.open( moves_path, "r" )    
+    moves = []
+    csv.shift #skip first headers - go positional !
+    csv.each do |row|
+      #scholars_mate,1, e2, e4, e4
+      if row[0]==match_name.to_s
+        moves << Move.new( :from_coord => row[2], :to_coord => row[3], :notation => row[4] ) 
+      end
+    end
+    moves
   end
 end
