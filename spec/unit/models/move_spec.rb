@@ -15,6 +15,9 @@ describe Move, 'A move' do
     m = Move.new( :d2, :d4 )
     m.from_coord.should == :d2 
     m.to_coord.should   == :d4
+    
+    m = Move.new( "Nc3" )
+    m.notation.should   == "Nc3"
   end
   
   it 'should be able to use symbols to refer to its coordinates' do

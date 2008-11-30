@@ -98,8 +98,9 @@ class Notation
     @promotion_choice = $6    
 
     possible_froms = @board.keys.select do |k| 
-      @board[k] && @board[k].role==@role && @board.allowed_moves(k).include?(@to_coord)
+      @board[k] && (@board[k].role==@role) && @board.allowed_moves(k).include?(@to_coord)
     end
+    raise Exception, "No #{@role} capable of moving to #{@notation} on this board" unless possible_froms.length > 0
     
     @from_coord = (possible_froms.length==1 && possible_froms[0]) || disambiguate( possible_froms )
         

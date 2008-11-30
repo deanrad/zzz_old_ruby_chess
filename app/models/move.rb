@@ -12,7 +12,8 @@ class Move < ActiveRecord::Base
   
   before_validation :calculate_board
   
-  validate  :ensure_coords_present_and_valid,
+  validate  :parse_notation,
+            :ensure_coords_present_and_valid,
             :piece_must_be_present_on_from_coord,
             :piece_must_move_to_allowed_square,
             :piece_must_belong_to_that_player_who_is_next_to_move,
@@ -40,6 +41,10 @@ class Move < ActiveRecord::Base
       super
       #before we can access these attributes
       self[:from_coord], self[:to_coord] = from, to
+    elsif opts.length == 1
+      notation = opts.shift
+      super
+      self[:notation] = notation 
     end
   end
 
@@ -47,6 +52,14 @@ class Move < ActiveRecord::Base
     @board ||= match.board if match
   end
 
+  def parse_notation
+    return if self[:notation].blank? 
+    notation = Notation.new( self[:notation], @board )
+    self[:from_coord], self[:to_coord] = notation.to_coords
+  rescue => ex
+    errors.add :notation, ex.to_s
+  end
+  
   def ensure_coords_present_and_valid
     [:from_coord, :to_coord].each do |coord|
       if self[coord].blank? 
