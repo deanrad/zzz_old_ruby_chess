@@ -23,7 +23,7 @@ class Notation
     Piece.role_to_abbrev(role) || ''
   end
   def self.role_of(abbrev)
-    Piece.abbrev_to_role(abbrev)
+    Piece.abbrev_to_role(abbrev) || :pawn
   end
   
   #does the work of serializing an instance of this class for display or db storage
@@ -90,7 +90,7 @@ class Notation
   def parse_regular
     raise Exception, "Unrecognized notation #{@notation}" unless @notation =~ NOTATION_REGEX
     # 1=piece moving   2=disambig  3=capture 4=coord 5/6=promo
-    # puts [$1, $2, $3, $4, $5, $6].inspect
+    # puts [$1, $2, $3, $4, $5, $6, @next_to_move].inspect
     @role = Notation.role_of($1)
     @disambiguator = $2
     @capture = !$3.blank?
@@ -98,7 +98,8 @@ class Notation
     @promotion_choice = $6    
 
     possible_froms = @board.keys.select do |k| 
-      @board[k] && (@board[k].role==@role) && @board.allowed_moves(k).include?(@to_coord)
+      @board[k] && (@board[k].role==@role) && (@board[k].side==@next_to_move)
+      @board.allowed_moves(k).include?(@to_coord) 
     end
     raise Exception, "No #{@role} capable of moving to #{@notation} on this board" unless possible_froms.length > 0
     
@@ -110,7 +111,7 @@ class Notation
   end
 
   def disambiguate( possible_froms )
-    raise Exception, "More than one #{@role} can move to #{@to_coord}. Please include a file or rank - Nbc3 or N5f7 for example." if @disambiguator.blank?
+    raise Exception, "More than one #{@role} can move to #{@to_coord}. Please include a file or rank to distinguish between #{possible_froms.inspect}" if @disambiguator.blank?
     
     match1, match2 = possible_froms.select{|f| f.to_s.include?(@disambiguator) }
     return match1 unless match2
