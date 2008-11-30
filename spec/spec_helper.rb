@@ -31,8 +31,8 @@ class Expectorant
 end
 
 ### include names 
-load 'spec/unit/models/active_record_mock.spec'
-load 'spec/unit/models/chess_mock.spec'
+load 'spec/models/active_record_mock.spec'
+load 'spec/models/chess_mock.spec'
 
 
 # A class, returned by .should on any object which can do comparisons to the expected results passed
@@ -81,21 +81,21 @@ class Object
     end
 
   else
-    #run all specs in unit\models
+    #run all specs in spec\models
     def spec_all
       Spec::Runner::CommandLine.run(
         Spec::Runner::OptionParser.parse(
-	   [File.expand_path( File.join( File.dirname( __FILE__), '/unit/models') ),
+	   [File.expand_path( File.join( File.dirname( __FILE__), '/models') ),
           '-p', '**/*spec*'
           ], $stderr, $stdout
         )
       )
     end
-    #use real rspec to run the example by the name given in ANY of the spec files in unit\models
+    #use real rspec to run the example by the name given in ANY of the spec files in spec\models
     def spec name
       Spec::Runner::CommandLine.run(
         Spec::Runner::OptionParser.parse(
-	   [File.expand_path( File.join( File.dirname( __FILE__), '/unit/models') ),
+	   [File.expand_path( File.join( File.dirname( __FILE__), '/models') ),
           '-p', '**/*spec*',
            '-e', name
           ], $stderr, $stdout
