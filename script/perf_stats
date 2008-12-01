@@ -23,6 +23,8 @@ include ChessFixtures
 #begin; GC.enable; GC.start; GC.disable; rescue nil; end
 
 num_times = 100
+num_immortal_times = 10
+
 cm_time = Benchmark.realtime do
   num_times.times do
     m = matches(:scholars_mate)
@@ -35,8 +37,14 @@ non_cm_time = Benchmark.realtime do
     m.moves << Move.new( :c4, :f7 )
   end
 end
+immortal_time = Benchmark.realtime do
+  num_immortal_times.times do
+    m = matches(:immortal) #plays every move through the end
+  end
+end
 
 puts "Scholars mate checkmate #{num_times} in #{cm_time} seconds"
 puts "Scholars mate non-checkmate #{num_times} in #{non_cm_time} seconds"
+puts "Replays the immortal match #{num_immortal_times} in #{immortal_time} seconds"
 #exec "#{irb} #{load_path} #{libs} --simple-prompt"
 
