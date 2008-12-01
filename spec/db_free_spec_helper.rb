@@ -12,6 +12,14 @@ end
   Dir.glob( File.expand_path(File.dirname(__FILE__) + "/../#{dir}/*.rb") ).each{ |f| load f }
 end
 
+#silencing those stupid errors
+module Spec
+  class << self
+    def exit?; true; end
+  end
+end
+
+
 class Object
   if ENV['MOCK_RSPEC']
     def describe name, *args, &block
