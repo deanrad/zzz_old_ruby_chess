@@ -15,28 +15,29 @@ DbFreeIncludes::IRB_LOAD_PATHS.each do |p|
 end
 
 DbFreeIncludes::IRB_REQUIRES.each{ |r| require r }
-# gem 'rails'
-require 'chess_fixtures'
 include ChessFixtures
 
-
-#begin; GC.enable; GC.start; GC.disable; rescue nil; end
 
 num_times = 100
 num_immortal_times = 10
 
+begin; GC.enable; GC.start; GC.disable; rescue nil; end
 cm_time = Benchmark.realtime do
   num_times.times do
     m = matches(:scholars_mate)
     m.moves << Move.new( :h5, :f7 )
   end
 end
+
+begin; GC.enable; GC.start; GC.disable; rescue nil; end
 non_cm_time = Benchmark.realtime do
   num_times.times do
     m = matches(:scholars_mate)
     m.moves << Move.new( :c4, :f7 )
   end
 end
+
+begin; GC.enable; GC.start; GC.disable; rescue nil; end
 immortal_time = Benchmark.realtime do
   num_immortal_times.times do
     m = matches(:immortal) #plays every move through the end
