@@ -6,8 +6,10 @@ unless ENV['MOCK_RSPEC'] == "1"
   require 'mocha'
 end
 
-# load our models
-Dir.glob( File.expand_path(File.dirname(__FILE__) + "/../app/models/**/*.rb") ).each{ |f| load f }
+# load our models - baseclasses first
+%w{ app/models app/models/pieces }.each do |dir|
+  Dir.glob( File.expand_path(File.dirname(__FILE__) + "/../#{dir}/*.rb") ).each{ |f| load f }
+end
 
 class Object
   if ENV['MOCK_RSPEC']
