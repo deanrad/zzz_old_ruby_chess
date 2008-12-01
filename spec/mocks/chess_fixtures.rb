@@ -6,16 +6,6 @@ module ChessFixtures
   
   def matches( which )
     #todo - get a fresh object from the object repository 
-    @@fixtures[:scholars_mate] = begin
-      m = Match.new
-      m.moves << Move.new( :from_coord => :e2 , :to_coord => :e4 )
-      m.moves << Move.new( :from_coord => :e7 , :to_coord => :e5 )
-      m.moves << Move.new( :from_coord => :d1 , :to_coord => :h5 )
-      m.moves << Move.new( :from_coord => :b8 , :to_coord => :c6 )
-      m.moves << Move.new( :from_coord => :f1 , :to_coord => :c4 )
-      m.moves << Move.new( :from_coord => :g8 , :to_coord => :f6 )
-      m
-    end
     @@fixtures[:unstarted_match] = begin
       m = Match.new
     end
@@ -46,7 +36,7 @@ module ChessFixtures
   #Read the moves.csv for matching lines  #TODO really ugly and hacky
   require 'csv'
   def moves_for_match( match_name )
-    moves_path =  File.expand_path( File.join( File.dirname( __FILE__), "/../spec/fixtures/moves.csv" ) )
+    moves_path =  File.expand_path( File.join( File.dirname( __FILE__), "/../fixtures/moves.csv" ) )
     csv = CSV.open( moves_path, "r" )    
     moves = []
     csv.shift #skip first headers - go positional !

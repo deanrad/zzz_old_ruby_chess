@@ -14,8 +14,6 @@ class Player
   attr_accessor :login
 end
 
-require 'chess_fixtures'
-
 #mix our fixtures in so they're available in all tests
 class Spec::Example::ExampleGroup
   include ::ChessFixtures

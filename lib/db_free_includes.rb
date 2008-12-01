@@ -6,13 +6,14 @@ module DbFreeIncludes
    logger
    util
    active_record_mock
-   load_models
-   spec/spec_helper
+   spec/db_free_spec_helper
+   chess_fixtures
    chess_active_record_mock
   }
 
   IRB_LOAD_PATHS = %w{
     lib
+    spec/mocks
     app/models
     app/models/pieces
   }
