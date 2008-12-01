@@ -1,4 +1,4 @@
-#require File.dirname(__FILE__) + '/../spec_helper'
+require File.dirname(__FILE__) + '/../spec_helper'
 
 describe Board do
   
@@ -87,7 +87,6 @@ describe Board do
     match.moves << Move.new(:from_coord => :h5, :to_coord => :f7) #queen- checkmate
     
     board = match.board
-    puts board
     board.in_checkmate?(:black).should be_true
   end
   

@@ -27,7 +27,6 @@ class Move < ActiveRecord::Base
 
   #this line added just for developing active_record_mock test case
   after_save :update_board, :check_for_mate
-  #after_save :check_for_mate
     
   attr_accessor :board
 

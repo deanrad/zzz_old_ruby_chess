@@ -1,4 +1,4 @@
-#require File.dirname(__FILE__) + '/../spec_helper'
+require File.dirname(__FILE__) + '/../spec_helper'
 
 describe Move, 'A move' do
 
@@ -29,11 +29,6 @@ describe Move, 'A move' do
     m.capture_coord.should == :a4
   end
   
-  #only tests that our fixture was set up right
-  #it 'should have its coordinates returned from database as symbols' do
-  #  matches(:dean_vs_maria).moves.first.to_coord.should == :d4
-  #end
-
   it 'should be invalid with any invalid coordinates' do 
     move = Move.new(:from_coord => :a2, :to_coord => 'broken')
     move.should_not be_valid
