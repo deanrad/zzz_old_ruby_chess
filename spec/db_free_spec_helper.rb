@@ -6,7 +6,7 @@ unless ENV['MOCK_RSPEC'] == "1"
   require 'mocha'
 end
 
-# load our models
+# load our models #note Dir.glob indeterministic order on different OS
 Dir.glob( File.expand_path(File.dirname(__FILE__) + "/../app/models/**/*.rb") ).each{ |f| load f }
 
 class Object
